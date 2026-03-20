@@ -9,7 +9,16 @@ import marisaPhoto from "../assets/doctors/marisa-meneses.jpg";
 import davidePhoto from "../assets/doctors/davide-carvalho.jpg";
 
 export type Doctor = {
-  id: "ana-giao" | "joao-giao" | "marisa-meneses" | "davide-carvalho";
+  id:
+    | "ana-giao-carvalho"
+    | "joao-giao-carvalho"
+    | "marisa-meneses"
+    | "natalia-vasconcelos"
+    | "alexandra-queiros"
+    | "davide-carvalho"
+    | "jorge-pedro"
+    | "isabel-brandao"
+    | "catia-dias";
   name: string;
   title: string;
   role: string;
