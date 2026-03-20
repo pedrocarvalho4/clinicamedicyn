@@ -39,3 +39,7 @@ export const CLINICS: Clinic[] = [
     specialties: ["Medicina Dentária"],
   },
 ];
+export const clinicImages = {
+  porto: "/clinicas/porto.jpg",
+  povoa: "/clinicas/povoa.jpg",
+} as const;
