@@ -1,10 +1,28 @@
 import { Link } from "react-router-dom";
 
+const heroImages = [
+  "/clinicas/porto.jpg",
+  "/clinicas/povoa.jpg",
+  "/clinicas/hero1.jpg",
+  "/clinicas/hero2.jpg",
+  "/clinicas/hero3.jpg",
+  "/clinicas/hero4.jpg",
+  "/clinicas/hero5.jpg",
+];
+
+const randomHeroImage =
+  heroImages[Math.floor(Math.random() * heroImages.length)];
+
 export default function Home() {
   return (
     <div>
       {/* HERO */}
       <div className="relative h-[320px] md:h-[420px] w-full overflow-hidden">
+        {/* <img
+          src={randomHeroImage}
+          alt="Clínica Medicyn"
+          className="h-full w-full object-cover"
+        />*/}
         <img
           src="/hero.jpg"
           alt="Clínica Medicyn"
@@ -25,19 +43,19 @@ export default function Home() {
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <a
-                href="/clinicas"
+              <Link
+                to="/clinicas"
                 className="rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
               >
                 Marcar Consulta
-              </a>
+              </Link>
 
-              <a
-                href="/medicos"
+              <Link
+                to="/medicos"
                 className="rounded-lg border border-white/40 px-6 py-3 font-semibold text-white hover:bg-white/10"
               >
                 Ver Equipa
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -55,7 +73,7 @@ export default function Home() {
 
         <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Link
-            to="/especialidades"
+            to="/especialidades?area=medicina-dentaria"
             className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
           >
             <div className="text-lg font-semibold text-slate-900">
@@ -67,7 +85,7 @@ export default function Home() {
           </Link>
 
           <Link
-            to="/especialidades"
+            to="/especialidades?area=endocrinologia"
             className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
           >
             <div className="text-lg font-semibold text-slate-900">
@@ -79,7 +97,7 @@ export default function Home() {
           </Link>
 
           <Link
-            to="/especialidades"
+            to="/especialidades?area=psiquiatria"
             className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
           >
             <div className="text-lg font-semibold text-slate-900">
@@ -91,7 +109,7 @@ export default function Home() {
           </Link>
 
           <Link
-            to="/especialidades"
+            to="/especialidades?area=podologia"
             className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
           >
             <div className="text-lg font-semibold text-slate-900">

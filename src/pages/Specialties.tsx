@@ -1,18 +1,42 @@
 import { SPECIALTIES } from "../data/specialties";
 import { DOCTORS } from "../data/doctors";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 export default function Specialties() {
+  const [searchParams] = useSearchParams();
+  const area = searchParams.get("area");
+
+  const filteredSpecialties = area
+    ? SPECIALTIES.filter((specialty) => specialty.id === area)
+    : SPECIALTIES;
+
+  const selectedSpecialty = SPECIALTIES.find(
+    (specialty) => specialty.id === area,
+  );
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="text-3xl font-semibold text-slate-900">Especialidades</h1>
 
       <p className="mt-3 text-slate-600">
-        Conheça as áreas clínicas disponíveis na Clínica Medicyn.
+        {selectedSpecialty
+          ? `Conheça a especialidade de ${selectedSpecialty.name}.`
+          : "Conheça as áreas clínicas disponíveis na Clínica Medicyn."}
       </p>
 
+      {selectedSpecialty && (
+        <div className="mt-4">
+          <Link
+            to="/especialidades"
+            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+          >
+            Ver todas as especialidades
+          </Link>
+        </div>
+      )}
+
       <div className="mt-8 space-y-8">
-        {SPECIALTIES.map((specialty) => {
+        {filteredSpecialties.map((specialty) => {
           const doctors = DOCTORS.filter((d) =>
             specialty.doctorIds.includes(d.id),
           );
@@ -35,7 +59,7 @@ export default function Specialties() {
                     <Link
                       key={doctor.id}
                       to={`/medicos/${doctor.id}`}
-                      className="rounded-lg border bg-slate-50 p-4 hover:bg-emerald-50 transition"
+                      className="rounded-lg border bg-slate-50 p-4 transition hover:bg-emerald-50"
                     >
                       <div className="font-semibold">
                         {doctor.title} {doctor.name}
@@ -43,19 +67,6 @@ export default function Specialties() {
 
                       <div className="text-sm text-slate-600">
                         {doctor.role}
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {doctor.clinics.includes("porto") && (
-                          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
-                            Porto
-                          </span>
-                        )}
-
-                        {doctor.clinics.includes("povoa") && (
-                          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
-                            Póvoa de Varzim
-                          </span>
-                        )}
                       </div>
 
                       <div className="mt-2 text-sm font-semibold text-emerald-700">
