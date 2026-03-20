@@ -44,6 +44,19 @@ export default function Specialties() {
                       <div className="text-sm text-slate-600">
                         {doctor.role}
                       </div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {doctor.clinics.includes("porto") && (
+                          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
+                            Porto
+                          </span>
+                        )}
+
+                        {doctor.clinics.includes("povoa") && (
+                          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
+                            Póvoa de Varzim
+                          </span>
+                        )}
+                      </div>
 
                       <div className="mt-2 text-sm font-semibold text-emerald-700">
                         Ver perfil →

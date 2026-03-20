@@ -2,93 +2,148 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
+    <div>
       {/* HERO */}
-      <section className="grid gap-8 md:grid-cols-2 items-center">
-        <div>
-          <h1 className="text-4xl font-semibold text-slate-900 sm:text-5xl">
-            Clínica Medicyn
-          </h1>
+      <div className="relative h-[320px] md:h-[420px] w-full overflow-hidden">
+        <img
+          src="/hero.jpg"
+          alt="Clínica Medicyn"
+          className="h-full w-full object-cover"
+        />
 
-          <p className="mt-4 text-lg text-slate-600">
-            Cuidados de saúde com foco em proximidade, confiança e qualidade
-            clínica.
-          </p>
+        <div className="absolute inset-0 bg-black/30" />
 
-          <p className="mt-3 text-slate-600">
-            A Clínica Medicyn oferece consultas de Medicina Dentária e
-            Endocrinologia nas unidades do Porto e da Póvoa de Varzim.
-          </p>
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto max-w-6xl px-4 text-white">
+            <h1 className="text-4xl font-semibold md:text-5xl">
+              Clínica Medicyn
+            </h1>
 
-          <div className="mt-6 flex gap-3">
-            <Link
-              to="/clinicas"
-              className="rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700"
-            >
-              Ver Clínicas
-            </Link>
+            <p className="mt-4 max-w-xl text-lg text-white/90">
+              Saúde de confiança com uma equipa dedicada em Medicina Dentária e
+              especialidades médicas.
+            </p>
 
-            <Link
-              to="/especialidades"
-              className="rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-3 font-semibold text-emerald-900 hover:bg-emerald-100"
-            >
-              Especialidades
-            </Link>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <a
+                href="/clinicas"
+                className="rounded-lg bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
+              >
+                Marcar Consulta
+              </a>
+
+              <a
+                href="/medicos"
+                className="rounded-lg border border-white/40 px-6 py-3 font-semibold text-white hover:bg-white/10"
+              >
+                Ver Equipa
+              </a>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* bloco visual */}
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-8">
-          <h3 className="text-lg font-semibold text-slate-900">
-            Especialidades
-          </h3>
+      {/* ESPECIALIDADES */}
+      <div className="mx-auto max-w-6xl px-4 py-12">
+        <h2 className="text-2xl font-semibold text-slate-900">
+          Especialidades
+        </h2>
 
-          <div className="mt-4 space-y-3">
-            <Link
-              to="/especialidades"
-              className="block rounded-xl border bg-white p-4 hover:bg-emerald-50"
-            >
-              <div className="font-semibold">Medicina Dentária</div>
-              <div className="text-sm text-slate-600">
-                Consultas e tratamentos dentários.
-              </div>
-            </Link>
+        <p className="mt-2 text-slate-600">
+          Áreas clínicas disponíveis na Clínica Medicyn.
+        </p>
 
-            <Link
-              to="/especialidades"
-              className="block rounded-xl border bg-white p-4 hover:bg-emerald-50"
-            >
-              <div className="font-semibold">Endocrinologia</div>
-              <div className="text-sm text-slate-600">
-                Avaliação de doenças hormonais e metabólicas.
-              </div>
-            </Link>
-          </div>
+        <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <Link
+            to="/especialidades"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">
+              Medicina Dentária
+            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              Consultas, diagnóstico e tratamentos de saúde oral.
+            </p>
+          </Link>
+
+          <Link
+            to="/especialidades"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">
+              Endocrinologia
+            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              Avaliação de alterações hormonais e metabólicas.
+            </p>
+          </Link>
+
+          <Link
+            to="/especialidades"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">
+              Psiquiatria
+            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              Acompanhamento especializado em saúde mental.
+            </p>
+          </Link>
+
+          <Link
+            to="/especialidades"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">
+              Podologia
+            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              Cuidados especializados do pé.
+            </p>
+          </Link>
         </div>
-      </section>
+      </div>
 
-      {/* SEÇÃO CLÍNICAS */}
-      <section className="mt-16">
+      {/* CLÍNICAS */}
+      <div className="mx-auto max-w-6xl px-4 pb-12">
         <h2 className="text-2xl font-semibold text-slate-900">
           As nossas clínicas
         </h2>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border bg-white p-6">
-            <h3 className="font-semibold text-lg">Porto</h3>
-            <p className="text-slate-600 text-sm mt-2">
-              Unidade clínica na cidade do Porto.
-            </p>
-          </div>
+        <p className="mt-2 text-slate-600">
+          A Clínica Medicyn está presente no Porto e na Póvoa de Varzim.
+        </p>
 
-          <div className="rounded-xl border bg-white p-6">
-            <h3 className="font-semibold text-lg">Póvoa de Varzim</h3>
-            <p className="text-slate-600 text-sm mt-2">
-              Unidade clínica na Póvoa de Varzim.
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <Link
+            to="/clinicas"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">Porto</div>
+            <p className="mt-2 text-sm text-slate-600">
+              Unidade com Medicina Dentária e outras especialidades médicas.
             </p>
-          </div>
+            <div className="mt-4 text-sm font-semibold text-emerald-700">
+              Ver clínica →
+            </div>
+          </Link>
+
+          <Link
+            to="/clinicas"
+            className="rounded-xl border bg-white p-6 hover:bg-slate-50 transition"
+          >
+            <div className="text-lg font-semibold text-slate-900">
+              Póvoa de Varzim
+            </div>
+            <p className="mt-2 text-sm text-slate-600">
+              Unidade dedicada à área de Medicina Dentária.
+            </p>
+            <div className="mt-4 text-sm font-semibold text-emerald-700">
+              Ver clínica →
+            </div>
+          </Link>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
