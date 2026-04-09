@@ -1,0 +1,23 @@
+[
+  {
+    "id": "world-health-day",
+    "title": "Dia Mundial da Saúde",
+    "month": 4,
+    "day": 7,
+    "type": "day",
+    "specialties": ["geral", "medicina-dentaria"],
+    "priority": "high",
+    "enabled": true,
+    "notes": "Data oficial global. Boa para notícia institucional."
+  },
+  {
+    "id": "foot-health-awareness-month",
+    "title": "Mês da Consciencialização do Pé",
+    "month": 4,
+    "type": "month",
+    "specialties": ["podologia"],
+    "priority": "medium",
+    "enabled": true,
+    "notes": "Campanha temática. Usar só se fizer sentido editorial."
+  }
+]
