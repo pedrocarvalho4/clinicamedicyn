@@ -17,132 +17,128 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Check editorial topics
+      - name: Check editorial topics for next 10 days
         id: editorial
         run: |
           python - <<'PY'
           import os
-          import re
-          import requests
-          from datetime import datetime
+          import json
+          from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
 
           tz = ZoneInfo("Europe/Lisbon")
-          now = datetime.now(tz)
-          month = now.month
-          day = now.day
-          year = now.year
+          today = datetime.now(tz).date()
 
-          month_names = {
-              1: ["january", "jan"],
-              2: ["february", "feb"],
-              3: ["march", "mar"],
-              4: ["april", "apr"],
-              5: ["may"],
-              6: ["june", "jun"],
-              7: ["july", "jul"],
-              8: ["august", "aug"],
-              9: ["september", "sep", "sept"],
-              10: ["october", "oct"],
-              11: ["november", "nov"],
-              12: ["december", "dec"]
-          }
+          events_file = "src/data/editorial-dates.json"
 
-          sources = [
-              {
-                  "id": "who",
-                  "name": "WHO Campaigns",
-                  "url": "https://www.who.int/campaigns",
-                  "keywords": ["world health day", "health", "campaign"],
-                  "specialties": ["geral"]
-              },
-              {
-                  "id": "fdi",
-                  "name": "FDI World Dental Federation",
-                  "url": "https://www.fdiworlddental.org/",
-                  "keywords": ["world oral health day", "oral health", "dental"],
-                  "specialties": ["medicina-dentaria"]
-              },
-              {
-                  "id": "ada",
-                  "name": "ADA Children's Dental Health Month",
-                  "url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
-                  "keywords": ["dental health month", "children", "oral health", "february"],
-                  "specialties": ["medicina-dentaria", "pediatria"]
-              }
-          ]
+          with open(events_file, "r", encoding="utf-8") as f:
+              events = json.load(f)
 
-          def clean_html(html):
-              html = re.sub(r"<script[\s\S]*?</script>", " ", html, flags=re.I)
-              html = re.sub(r"<style[\s\S]*?</style>", " ", html, flags=re.I)
-              html = re.sub(r"<[^>]+>", " ", html)
-              html = re.sub(r"\s+", " ", html)
-              return html.strip().lower()
+          upcoming_matches = []
 
-          def build_patterns(month, day):
-              patterns = []
-              for m in month_names[month]:
-                  patterns.append(f"{day} {m}")
-                  patterns.append(f"{m} {day}")
-              return patterns
+          for event in events:
+              event_year = event.get("year")
+              month = event.get("month")
+              day = event.get("day")
+              duration_days = event.get("duration_days")
+              title = event.get("title", "Sem título")
 
-          date_patterns = build_patterns(month, day)
-          month_patterns = month_names[month]
+              if not month or not day:
+                  continue
 
-          headers = {
-              "User-Agent": "MedicynEditorialBot/1.0"
-          }
+              # Campanhas/mensalidades com duração definida
+              if duration_days:
+                  if event_year and event_year != today.year:
+                      continue
 
-          matches = []
+                  start_date = datetime(today.year, month, day, tzinfo=tz).date()
+                  if event_year:
+                      start_date = datetime(event_year, month, day, tzinfo=tz).date()
 
-          for source in sources:
-              try:
-                  response = requests.get(source["url"], headers=headers, timeout=30)
-                  response.raise_for_status()
-                  text = clean_html(response.text)
+                  end_date = start_date + timedelta(days=duration_days - 1)
 
-                  keyword_hits = [k for k in source["keywords"] if k.lower() in text]
-                  has_month = any(m in text for m in month_patterns)
-                  has_day_pattern = any(p in text for p in date_patterns)
-
-                  score = len(keyword_hits) * 10
-                  if has_month:
-                      score += 10
-                  if has_day_pattern:
-                      score += 20
-
-                  if score >= 20:
-                      matches.append({
-                          "id": source["id"],
-                          "name": source["name"],
-                          "url": source["url"],
-                          "score": score,
-                          "keyword_hits": keyword_hits,
-                          "specialties": source["specialties"]
+                  # Se a campanha ainda não começou, mas começa nos próximos 10 dias
+                  if today <= start_date <= today + timedelta(days=10):
+                      upcoming_matches.append({
+                          **event,
+                          "event_date": start_date.isoformat(),
+                          "days_until": (start_date - today).days,
+                          "kind": "campaign_start"
                       })
+                      continue
 
-                  print(f"{source['name']} -> score={score} keywords={keyword_hits}")
+                  # Se a campanha já está a decorrer
+                  if start_date <= today <= end_date:
+                      upcoming_matches.append({
+                          **event,
+                          "event_date": start_date.isoformat(),
+                          "days_until": 0,
+                          "kind": "campaign_active"
+                      })
+                      continue
 
-              except Exception as e:
-                  print(f"{source['name']} -> error: {e}")
+                  continue
+
+              # Evento anual fixo ou com ano específico
+              if event_year:
+                  event_date = datetime(event_year, month, day, tzinfo=tz).date()
+
+                  if event_date < today:
+                      continue
+              else:
+                  event_date = datetime(today.year, month, day, tzinfo=tz).date()
+
+                  if event_date < today:
+                      event_date = datetime(today.year + 1, month, day, tzinfo=tz).date()
+
+              days_until = (event_date - today).days
+
+              if 0 <= days_until <= 10:
+                  upcoming_matches.append({
+                      **event,
+                      "event_date": event_date.isoformat(),
+                      "days_until": days_until,
+                      "kind": "day"
+                  })
+
+          upcoming_matches.sort(key=lambda x: (x["days_until"], x.get("title", "")))
 
           output_path = os.environ["GITHUB_OUTPUT"]
 
-          if matches:
-              top = sorted(matches, key=lambda x: x["score"], reverse=True)[0]
+          if upcoming_matches:
+              top = upcoming_matches[0]
 
-              title = f"Sugestão de notícia - {top['name']} - {day:02d}-{month:02d}-{year}"
-              body = f"""Foi detetado um tema potencialmente relevante para esta data.
+              category = top.get("category", "general")
+              specialties = ", ".join(top.get("specialties", []))
+              source_name = top.get("source_name", "N/A")
+              source_url = top.get("source_url", "")
+              notes = top.get("notes", "")
 
-          **Fonte:** {top['name']}
-          **URL:** {top['url']}
-          **Especialidades:** {", ".join(top['specialties'])}
-          **Data:** {day:02d}/{month:02d}/{year}
-          **Keywords detetadas:** {", ".join(top['keyword_hits'])}
+              if top["kind"] == "campaign_active":
+                  title = f"Sugestão de notícia - {top['title']} - campanha em curso"
+                  timing = "já está a decorrer"
+              elif top["kind"] == "campaign_start":
+                  title = f"Sugestão de notícia - {top['title']} - começa em {top['days_until']} dia(s)"
+                  timing = f"começa a {top['event_date']}"
+              else:
+                  title = f"Sugestão de notícia - {top['title']} - em {top['days_until']} dia(s)"
+                  timing = f"acontece a {top['event_date']}"
+
+              body = f"""Foi identificado um tema editorial relevante que {timing}.
+
+          **Evento:** {top['title']}
+          **Categoria:** {category}
+          **Data do evento:** {top['event_date']}
+          **Faltam:** {top['days_until']} dia(s)
+          **Especialidades:** {specialties}
+          **Fonte:** {source_name}
+          **URL:** {source_url}
+          **Notas:** {notes}
 
           ### Próximos passos
-          - Rever se o tema faz sentido para a clínica
-          - Pedir texto e imagem
+          - Rever se faz sentido publicar no site
+          - Pedir texto e imagem no ChatGPT
+          - Adicionar entrada ao `src/data/news.ts`
           - Publicar manualmente no site
           """
 
@@ -158,14 +154,13 @@ jobs:
       - name: Create issue
         if: steps.editorial.outputs.has_match == 'true'
         uses: actions/github-script@v7
+        env:
+          ISSUE_TITLE: ${{ steps.editorial.outputs.title }}
+          ISSUE_BODY: ${{ steps.editorial.outputs.body }}
         with:
           script: |
-            const title = JSON.parse(${{
-              toJSON(steps.editorial.outputs.title)
-            }});
-            const body = JSON.parse(${{
-              toJSON(steps.editorial.outputs.body)
-            }});
+            const title = process.env.ISSUE_TITLE;
+            const body = process.env.ISSUE_BODY;
 
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
