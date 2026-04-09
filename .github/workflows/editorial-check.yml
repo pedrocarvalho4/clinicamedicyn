@@ -1,0 +1,29 @@
+name: Editorial Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 8 * * *'
+
+jobs:
+  check-editorial-date:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch WHO campaigns page
+        run: |
+          python - <<'PY'
+          import requests
+
+          url = "https://www.who.int/campaigns"
+          headers = {
+              "User-Agent": "MedicynEditorialBot/1.0"
+          }
+
+          response = requests.get(url, headers=headers, timeout=30)
+          print("STATUS:", response.status_code)
+          print(response.text[:5000])
+          PY
