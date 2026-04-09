@@ -1,67 +1,189 @@
-[
-  {
-    "id": "fdi-world-oral-health",
-    "name": "FDI World Dental Federation",
-    "url": "https://www.fdiworlddental.org/",
-    "type": "html",
-    "specialties": ["medicina-dentaria"],
-    "priority": "high",
-    "enabled": true,
-    "keywords": [
-      "World Oral Health Day",
-      "oral health day",
-      "20 March",
-      "happy mouth"
-    ],
-    "notes": "Fonte principal para efemérides globais de saúde oral."
-  },
-  {
-    "id": "who-oral-health",
-    "name": "WHO Oral Health",
-    "url": "https://www.who.int/health-topics/oral-health",
-    "type": "html",
-    "specialties": ["medicina-dentaria", "geral"],
-    "priority": "high",
-    "enabled": true,
-    "keywords": [
-      "oral health",
-      "prevention",
-      "oral diseases",
-      "health"
-    ],
-    "notes": "Fonte institucional para enquadramento e validação clínica."
-  },
-  {
-    "id": "ada-childrens-dental-health-month",
-    "name": "ADA National Children's Dental Health Month",
-    "url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
-    "type": "html",
-    "specialties": ["medicina-dentaria", "pediatria"],
-    "priority": "medium",
-    "enabled": true,
-    "keywords": [
-      "National Children's Dental Health Month",
-      "February",
-      "children",
-      "oral health"
-    ],
-    "notes": "Campanha recorrente útil para conteúdo infantil/preventivo."
-  },
-  {
-    "id": "oral-health-foundation",
-    "name": "Oral Health Foundation",
-    "url": "https://www.dentalhealth.org/",
-    "type": "html",
-    "specialties": ["medicina-dentaria"],
-    "priority": "medium",
-    "enabled": true,
-    "keywords": [
-      "oral health",
-      "campaign",
-      "awareness",
-      "mouth cancer",
-      "smile"
-    ],
-    "notes": "Fonte complementar. Requer filtro editorial."
-  }
-]
+name: Editorial Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 8 */5 * *'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-editorial-date:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check editorial topics
+        id: editorial
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import requests
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          tz = ZoneInfo("Europe/Lisbon")
+          now = datetime.now(tz)
+          month = now.month
+          day = now.day
+          year = now.year
+
+          month_names = {
+              1: ["january", "jan"],
+              2: ["february", "feb"],
+              3: ["march", "mar"],
+              4: ["april", "apr"],
+              5: ["may"],
+              6: ["june", "jun"],
+              7: ["july", "jul"],
+              8: ["august", "aug"],
+              9: ["september", "sep", "sept"],
+              10: ["october", "oct"],
+              11: ["november", "nov"],
+              12: ["december", "dec"]
+          }
+
+          sources = [
+              {
+                  "id": "who",
+                  "name": "WHO Campaigns",
+                  "url": "https://www.who.int/campaigns",
+                  "keywords": ["world health day", "health", "campaign"],
+                  "specialties": ["geral"]
+              },
+              {
+                  "id": "fdi",
+                  "name": "FDI World Dental Federation",
+                  "url": "https://www.fdiworlddental.org/",
+                  "keywords": ["world oral health day", "oral health", "dental"],
+                  "specialties": ["medicina-dentaria"]
+              },
+              {
+                  "id": "ada",
+                  "name": "ADA Children's Dental Health Month",
+                  "url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
+                  "keywords": ["dental health month", "children", "oral health", "february"],
+                  "specialties": ["medicina-dentaria", "pediatria"]
+              }
+          ]
+
+          def clean_html(html):
+              html = re.sub(r"<script[\s\S]*?</script>", " ", html, flags=re.I)
+              html = re.sub(r"<style[\s\S]*?</style>", " ", html, flags=re.I)
+              html = re.sub(r"<[^>]+>", " ", html)
+              html = re.sub(r"\s+", " ", html)
+              return html.strip().lower()
+
+          def build_patterns(month, day):
+              patterns = []
+              for m in month_names[month]:
+                  patterns.append(f"{day} {m}")
+                  patterns.append(f"{m} {day}")
+              return patterns
+
+          date_patterns = build_patterns(month, day)
+          month_patterns = month_names[month]
+
+          headers = {
+              "User-Agent": "MedicynEditorialBot/1.0"
+          }
+
+          matches = []
+
+          for source in sources:
+              try:
+                  response = requests.get(source["url"], headers=headers, timeout=30)
+                  response.raise_for_status()
+                  text = clean_html(response.text)
+
+                  keyword_hits = [k for k in source["keywords"] if k.lower() in text]
+                  has_month = any(m in text for m in month_patterns)
+                  has_day_pattern = any(p in text for p in date_patterns)
+
+                  score = len(keyword_hits) * 10
+                  if has_month:
+                      score += 10
+                  if has_day_pattern:
+                      score += 20
+
+                  if score >= 20:
+                      matches.append({
+                          "id": source["id"],
+                          "name": source["name"],
+                          "url": source["url"],
+                          "score": score,
+                          "keyword_hits": keyword_hits,
+                          "specialties": source["specialties"]
+                      })
+
+                  print(f"{source['name']} -> score={score} keywords={keyword_hits}")
+
+              except Exception as e:
+                  print(f"{source['name']} -> error: {e}")
+
+          output_path = os.environ["GITHUB_OUTPUT"]
+
+          if matches:
+              top = sorted(matches, key=lambda x: x["score"], reverse=True)[0]
+
+              title = f"Sugestão de notícia - {top['name']} - {day:02d}-{month:02d}-{year}"
+              body = f"""Foi detetado um tema potencialmente relevante para esta data.
+
+          **Fonte:** {top['name']}
+          **URL:** {top['url']}
+          **Especialidades:** {", ".join(top['specialties'])}
+          **Data:** {day:02d}/{month:02d}/{year}
+          **Keywords detetadas:** {", ".join(top['keyword_hits'])}
+
+          ### Próximos passos
+          - Rever se o tema faz sentido para a clínica
+          - Pedir texto e imagem
+          - Publicar manualmente no site
+          """
+
+              with open(output_path, "a", encoding="utf-8") as f:
+                  f.write("has_match=true\n")
+                  f.write(f"title<<EOF\n{title}\nEOF\n")
+                  f.write(f"body<<EOF\n{body}\nEOF\n")
+          else:
+              with open(output_path, "a", encoding="utf-8") as f:
+                  f.write("has_match=false\n")
+          PY
+
+      - name: Create issue
+        if: steps.editorial.outputs.has_match == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = JSON.parse(${{
+              toJSON(steps.editorial.outputs.title)
+            }});
+            const body = JSON.parse(${{
+              toJSON(steps.editorial.outputs.body)
+            }});
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100
+            });
+
+            const alreadyExists = issues.some(issue => issue.title === title);
+
+            if (alreadyExists) {
+              core.info(`Issue already exists: ${title}`);
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body
+              });
+              core.info(`Issue created: ${title}`);
+            }
