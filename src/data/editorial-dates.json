@@ -1,23 +1,67 @@
 [
   {
-    "id": "world-health-day",
-    "title": "Dia Mundial da Saúde",
-    "month": 4,
-    "day": 7,
-    "type": "day",
-    "specialties": ["geral", "medicina-dentaria"],
+    "id": "fdi-world-oral-health",
+    "name": "FDI World Dental Federation",
+    "url": "https://www.fdiworlddental.org/",
+    "type": "html",
+    "specialties": ["medicina-dentaria"],
     "priority": "high",
     "enabled": true,
-    "notes": "Data oficial global. Boa para notícia institucional."
+    "keywords": [
+      "World Oral Health Day",
+      "oral health day",
+      "20 March",
+      "happy mouth"
+    ],
+    "notes": "Fonte principal para efemérides globais de saúde oral."
   },
   {
-    "id": "foot-health-awareness-month",
-    "title": "Mês da Consciencialização do Pé",
-    "month": 4,
-    "type": "month",
-    "specialties": ["podologia"],
+    "id": "who-oral-health",
+    "name": "WHO Oral Health",
+    "url": "https://www.who.int/health-topics/oral-health",
+    "type": "html",
+    "specialties": ["medicina-dentaria", "geral"],
+    "priority": "high",
+    "enabled": true,
+    "keywords": [
+      "oral health",
+      "prevention",
+      "oral diseases",
+      "health"
+    ],
+    "notes": "Fonte institucional para enquadramento e validação clínica."
+  },
+  {
+    "id": "ada-childrens-dental-health-month",
+    "name": "ADA National Children's Dental Health Month",
+    "url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
+    "type": "html",
+    "specialties": ["medicina-dentaria", "pediatria"],
     "priority": "medium",
     "enabled": true,
-    "notes": "Campanha temática. Usar só se fizer sentido editorial."
+    "keywords": [
+      "National Children's Dental Health Month",
+      "February",
+      "children",
+      "oral health"
+    ],
+    "notes": "Campanha recorrente útil para conteúdo infantil/preventivo."
+  },
+  {
+    "id": "oral-health-foundation",
+    "name": "Oral Health Foundation",
+    "url": "https://www.dentalhealth.org/",
+    "type": "html",
+    "specialties": ["medicina-dentaria"],
+    "priority": "medium",
+    "enabled": true,
+    "keywords": [
+      "oral health",
+      "campaign",
+      "awareness",
+      "mouth cancer",
+      "smile"
+    ],
+    "notes": "Fonte complementar. Requer filtro editorial."
   }
 ]
