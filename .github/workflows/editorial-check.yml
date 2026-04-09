@@ -33,7 +33,7 @@ jobs:
                   "id": "world-health-day",
                   "title": "Dia Mundial da Saúde",
                   "month": 4,
-                  "day": 7,
+                  "day": 12,
                   "specialties": ["geral"],
                   "source_name": "WHO",
                   "source_url": "https://www.who.int/campaigns/world-health-day",
