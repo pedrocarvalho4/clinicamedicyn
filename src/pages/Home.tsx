@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import NewsSection from "../components/NewsSection";
 
 const heroImages = [
   "/clinicas/porto.jpg",
@@ -60,6 +61,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <NewsSection />
 
       {/* ESPECIALIDADES */}
       <div className="mx-auto max-w-6xl px-4 py-12">

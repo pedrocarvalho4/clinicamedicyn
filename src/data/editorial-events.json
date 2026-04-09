@@ -1,0 +1,72 @@
+[
+  {
+    "id": "world-health-day",
+    "title": "Dia Mundial da Saúde",
+    "month": 4,
+    "day": 7,
+    "category": "health",
+    "specialties": ["geral"],
+    "source_name": "WHO",
+    "source_url": "https://www.who.int/campaigns/world-health-day",
+    "notes": "Data oficial global de saúde."
+  },
+  {
+    "id": "world-oral-health-day",
+    "title": "Dia Mundial da Saúde Oral",
+    "month": 3,
+    "day": 20,
+    "category": "health",
+    "specialties": ["medicina-dentaria"],
+    "source_name": "FDI World Dental Federation",
+    "source_url": "https://www.fdiworlddental.org/world-oral-health-day",
+    "notes": "Efeméride principal da medicina dentária."
+  },
+  {
+    "id": "dia-do-trabalhador",
+    "title": "Dia do Trabalhador",
+    "month": 5,
+    "day": 1,
+    "category": "holiday",
+    "specialties": ["geral"],
+    "source_name": "Calendário civil",
+    "source_url": "https://example.com",
+    "notes": "Data anual fixa."
+  },
+  {
+    "id": "pascoa-2026",
+    "title": "Páscoa",
+    "year": 2026,
+    "month": 4,
+    "day": 5,
+    "category": "holiday",
+    "specialties": ["geral"],
+    "source_name": "Calendário festivo",
+    "source_url": "https://example.com",
+    "notes": "Data variável, definida manualmente para 2026."
+  },
+  {
+    "id": "carnaval-2026",
+    "title": "Carnaval",
+    "year": 2026,
+    "month": 2,
+    "day": 17,
+    "category": "holiday",
+    "specialties": ["geral"],
+    "source_name": "Calendário festivo",
+    "source_url": "https://example.com",
+    "notes": "Data variável, definida manualmente para 2026."
+  },
+  {
+    "id": "childrens-dental-health-month-2026",
+    "title": "Mês da Saúde Oral Infantil",
+    "year": 2026,
+    "month": 2,
+    "day": 1,
+    "category": "campaign",
+    "specialties": ["medicina-dentaria", "pediatria"],
+    "source_name": "ADA",
+    "source_url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
+    "notes": "Campanha mensal; usar durante fevereiro.",
+    "duration_days": 28
+  }
+]

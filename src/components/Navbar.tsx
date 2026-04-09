@@ -16,20 +16,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <NavLink to="/" className="flex items-center gap-3">
-          <div className="h-10 w-10 overflow-hidden rounded-xl ring-1 ring-emerald-100">
-            <img
-              src="/favicon.png"
-              alt="Medicyn logo"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold text-slate-900">
-              Clínica Medicyn
-            </div>
-            <div className="text-xs text-slate-500">Saúde de confiança</div>
-          </div>
+        <NavLink to="/" className="flex items-center">
+          <img
+            src="/cm-logo-completo.png"
+            alt="Clínica Medicyn"
+            className="h-12 w-auto object-contain"
+          />
         </NavLink>
 
         {/* Menu desktop */}

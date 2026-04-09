@@ -10,6 +10,7 @@ import Specialties from "./pages/Specialties";
 import Agreements from "./pages/Agreements";
 import NotFound from "./pages/NotFound";
 import DoctorProfile from "./pages/DoctorProfile";
+import NewsPage from "./pages/NewsPage";
 import "./index.css";
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/medicos/:id" element={<DoctorProfile />} />
             <Route path="/especialidades" element={<Specialties />} />
             <Route path="/acordos" element={<Agreements />} />
+            <Route path="/noticias" element={<NewsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
