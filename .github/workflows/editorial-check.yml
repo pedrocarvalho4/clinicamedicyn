@@ -3,7 +3,11 @@ name: Editorial Check
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 8 * * *'
+    - cron: '15 8 */5 * *'
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   check-editorial-date:
@@ -13,17 +17,142 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Fetch WHO campaigns page
+      - name: Check editorial topics for next 10 days
+        id: editorial
         run: |
           python - <<'PY'
-          import requests
+          import os
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
 
-          url = "https://www.who.int/campaigns"
-          headers = {
-              "User-Agent": "MedicynEditorialBot/1.0"
-          }
+          tz = ZoneInfo("Europe/Lisbon")
+          now = datetime.now(tz).date()
 
-          response = requests.get(url, headers=headers, timeout=30)
-          print("STATUS:", response.status_code)
-          print(response.text[:5000])
+          events = [
+              {
+                  "id": "world-health-day",
+                  "title": "Dia Mundial da Saúde",
+                  "month": 4,
+                  "day": 7,
+                  "specialties": ["geral"],
+                  "source_name": "WHO",
+                  "source_url": "https://www.who.int/campaigns/world-health-day",
+                  "notes": "Data oficial global de saúde."
+              },
+              {
+                  "id": "world-oral-health-day",
+                  "title": "Dia Mundial da Saúde Oral",
+                  "month": 3,
+                  "day": 20,
+                  "specialties": ["medicina-dentaria"],
+                  "source_name": "FDI World Dental Federation",
+                  "source_url": "https://www.fdiworlddental.org/world-oral-health-day",
+                  "notes": "Efeméride principal da medicina dentária."
+              },
+              {
+                  "id": "childrens-dental-health-month",
+                  "title": "Mês da Saúde Oral Infantil",
+                  "month": 2,
+                  "day": 1,
+                  "specialties": ["medicina-dentaria", "pediatria"],
+                  "source_name": "ADA",
+                  "source_url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
+                  "notes": "Campanha mensal; usar durante fevereiro."
+              }
+          ]
+
+          upcoming_matches = []
+
+          for event in events:
+              if event["id"] == "childrens-dental-health-month":
+                  if now.month == 2:
+                      upcoming_matches.append({
+                          **event,
+                          "event_date": now.isoformat(),
+                          "days_until": 0,
+                          "kind": "month"
+                      })
+                  continue
+
+              event_date = datetime(now.year, event["month"], event["day"], tzinfo=tz).date()
+
+              if event_date < now:
+                  event_date = datetime(now.year + 1, event["month"], event["day"], tzinfo=tz).date()
+
+              days_until = (event_date - now).days
+
+              if 0 <= days_until <= 10:
+                  upcoming_matches.append({
+                      **event,
+                      "event_date": event_date.isoformat(),
+                      "days_until": days_until,
+                      "kind": "day"
+                  })
+
+          upcoming_matches.sort(key=lambda x: x["days_until"])
+
+          output_path = os.environ["GITHUB_OUTPUT"]
+
+          if upcoming_matches:
+              top = upcoming_matches[0]
+
+              if top["kind"] == "month":
+                  title = f"Sugestão de notícia - {top['title']} - mês atual"
+                  timing = "decorre neste mês"
+              else:
+                  title = f"Sugestão de notícia - {top['title']} - em {top['days_until']} dia(s)"
+                  timing = f"acontece a {top['event_date']}"
+
+              body = f"""Foi identificado um tema editorial relevante que {timing}.
+
+          **Evento:** {top['title']}
+          **Data do evento:** {top['event_date']}
+          **Faltam:** {top['days_until']} dia(s)
+          **Especialidades:** {", ".join(top['specialties'])}
+          **Fonte:** {top['source_name']}
+          **URL:** {top['source_url']}
+          **Notas:** {top['notes']}
+
+          ### Próximos passos
+          - Rever se faz sentido publicar no site
+          - Pedir texto e imagem no ChatGPT
+          - Publicar manualmente no site
+          """
+
+              with open(output_path, "a", encoding="utf-8") as f:
+                  f.write("has_match=true\n")
+                  f.write(f"title<<EOF\n{title}\nEOF\n")
+                  f.write(f"body<<EOF\n{body}\nEOF\n")
+          else:
+              with open(output_path, "a", encoding="utf-8") as f:
+                  f.write("has_match=false\n")
           PY
+
+      - name: Create issue
+        if: steps.editorial.outputs.has_match == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = JSON.parse(${{ toJSON(steps.editorial.outputs.title) }});
+            const body = JSON.parse(${{ toJSON(steps.editorial.outputs.body) }});
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100
+            });
+
+            const alreadyExists = issues.some(issue => issue.title === title);
+
+            if (alreadyExists) {
+              core.info(`Issue already exists: ${title}`);
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body
+              });
+              core.info(`Issue created: ${title}`);
+            }
