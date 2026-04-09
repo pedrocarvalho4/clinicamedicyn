@@ -28,39 +28,6 @@ jobs:
           tz = ZoneInfo("Europe/Lisbon")
           now = datetime.now(tz).date()
 
-          events = [
-              {
-                  "id": "world-health-day",
-                  "title": "Dia Mundial da Saúde",
-                  "month": 4,
-                  "day": 12,
-                  "specialties": ["geral"],
-                  "source_name": "WHO",
-                  "source_url": "https://www.who.int/campaigns/world-health-day",
-                  "notes": "Data oficial global de saúde."
-              },
-              {
-                  "id": "world-oral-health-day",
-                  "title": "Dia Mundial da Saúde Oral",
-                  "month": 3,
-                  "day": 20,
-                  "specialties": ["medicina-dentaria"],
-                  "source_name": "FDI World Dental Federation",
-                  "source_url": "https://www.fdiworlddental.org/world-oral-health-day",
-                  "notes": "Efeméride principal da medicina dentária."
-              },
-              {
-                  "id": "childrens-dental-health-month",
-                  "title": "Mês da Saúde Oral Infantil",
-                  "month": 2,
-                  "day": 1,
-                  "specialties": ["medicina-dentaria", "pediatria"],
-                  "source_name": "ADA",
-                  "source_url": "https://www.ada.org/resources/community-initiatives/national-childrens-dental-health-month",
-                  "notes": "Campanha mensal; usar durante fevereiro."
-              }
-          ]
-
           upcoming_matches = []
 
           for event in events:
@@ -128,13 +95,16 @@ jobs:
                   f.write("has_match=false\n")
           PY
 
-      - name: Create issue
+     - name: Create issue
         if: steps.editorial.outputs.has_match == 'true'
         uses: actions/github-script@v7
+        env:
+          ISSUE_TITLE: ${{ steps.editorial.outputs.title }}
+          ISSUE_BODY: ${{ steps.editorial.outputs.body }}
         with:
           script: |
-            const title = JSON.parse(${{ toJSON(steps.editorial.outputs.title) }});
-            const body = JSON.parse(${{ toJSON(steps.editorial.outputs.body) }});
+            const title = process.env.ISSUE_TITLE;
+            const body = process.env.ISSUE_BODY;
 
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
