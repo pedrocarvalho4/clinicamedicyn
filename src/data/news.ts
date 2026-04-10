@@ -50,16 +50,31 @@ export const newsItems: NewsItem[] = [
     isPublished: true,
   },
   {
-    id: "medico-evento-exemplo",
-    title: "Participação em evento científico",
-    date: "2026-04-15",
+    id: "alexandra-queiros-praca-da-alegria-2026",
+    title: "Alexandra Queirós na Praça da Alegria",
+    date: "2026-04-06",
     excerpt:
-      "Um dos nossos profissionais marcou presença num evento científico dedicado à atualização clínica e partilha de conhecimento.",
+      "No passado dia 6 de abril de 2026, Alexandra Queirós, higienista oral, participou no programa Praça da Alegria, da RTP, onde falou sobre saúde oral.",
     content:
-      "A participação em congressos, formações e encontros científicos faz parte do compromisso da Clínica Medicyn com a atualização contínua e a excelência clínica.",
-    category: "event",
-    mediaType: "youtube",
-    videoUrl: "https://www.youtube.com/watch?v=SEU_VIDEO_ID",
-    isPublished: false,
+      "No passado dia 6 de abril de 2026, Alexandra Queirós, higienista oral da Clínica Medicyn, participou no programa Praça da Alegria, da RTP, onde falou sobre a importância da saúde oral. Durante a sua intervenção, destacou a relevância da prevenção, dos cuidados de higiene oral e da adoção de hábitos adequados no dia a dia. Se procura acompanhamento profissional em saúde oral, a Clínica Medicyn no Porto dispõe de uma equipa especializada pronta para o ajudar.",
+    category: "clinic",
+    mediaType: "image",
+    image: "/images/news/alexandra-queiros-praca-alegria.jpg",
+    isPublished: true,
+    featured: true,
+  },
+  {
+    id: "davide-carvalho-consultorio-porto-canal-2026",
+    title: "Prof. Dr. Davide Carvalho no Consultório",
+    date: "2026-04-08",
+    excerpt:
+      "No passado dia 8 de abril de 2026, o Prof. Dr. Davide Carvalho participou no programa Consultório, do Porto Canal, onde falou sobre a Doença de Cushing.",
+    content:
+      "No passado dia 8 de abril de 2026, o Prof. Dr. Davide Carvalho participou no programa Consultório, do Porto Canal, onde abordou a Doença de Cushing. Durante a sua participação, esclareceu aspetos importantes sobre esta patologia, incluindo sintomas, sinais de alerta, diagnóstico e acompanhamento clínico. Esta presença reforça o compromisso da Clínica Medicyn com a partilha de informação médica credível e acessível. Para acompanhamento especializado em endocrinologia, a Clínica Medicyn no Porto dispõe de profissionais diferenciados.",
+    category: "clinic",
+    mediaType: "image",
+    image: "/images/news/davide-carvalho-porto-canal.png",
+    isPublished: true,
+    featured: true,
   },
 ];
